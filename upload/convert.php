@@ -9,14 +9,15 @@ twitter: https://twitter.com/pafnuty_name
 google+: http://gplus.to/pafnuty
 email:   pafnuty10@gmail.com
 =============================================================================
-Файл:   converter.php
+Файл:   convert.php
 -----------------------------------------------------------------------------
 Версия: 1.0 (08.08.2014)
 =============================================================================
 */
 
 define('DATALIFEENGINE', true);
-define( 'ENGINE_DIR', dirname(  __FILE__ ) . '/engine' );
+define('ENGINE_DIR', '/engine');
+
 require_once ENGINE_DIR . '/classes/mysql.php';
 require_once ENGINE_DIR . '/data/dbconfig.php';
 
@@ -44,7 +45,7 @@ function step1() {
 	$DBUSER = DBUSER;
 	$DBPASS = DBPASS;
 	$step1  = <<<HTML
-	<form method="get" action="converter.php">
+	<form method="get" action="convert.php">
 		<input type="hidden" name="igree" value="Y">
 		<input type="hidden" name="step2" value="Y">
 		<div class="descr">
@@ -112,7 +113,7 @@ function step2() {
 	mysql_select_db($dbname);
 
 	mysql_query('SET NAMES utf8;');
-	$step2 = '<form method="get" action="converter.php"><input type="hidden" name="igree" value="Y">
+	$step2 = '<form method="get" action="convert.php"><input type="hidden" name="igree" value="Y">
 				<input type="hidden" name="step3" value="Y">';
 
 	$rs = mysql_query('SHOW TABLES;');
