@@ -16,8 +16,7 @@ email:   pafnuty10@gmail.com
 */
 
 define('DATALIFEENGINE', true);
-define('ENGINE_DIR', '/engine');
-
+define( 'ENGINE_DIR', dirname(  __FILE__ ) . '/engine' );
 require_once ENGINE_DIR . '/classes/mysql.php';
 require_once ENGINE_DIR . '/data/dbconfig.php';
 
@@ -586,4 +585,3 @@ HTML;
 </div>
 </body>
 </html>
-
