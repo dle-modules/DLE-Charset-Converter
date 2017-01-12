@@ -116,83 +116,28 @@ function step2() {
 	$step2 = '<form method="get" action="convert.php"><input type="hidden" name="igree" value="Y">
 				<input type="hidden" name="step3" value="Y">';
 
-	$rs = mysql_query('SHOW TABLES;');
+	$rs = mysql_query('SELECT 
+ t.`TABLE_NAME` as table,
+CONCAT(\'ALTER TABLE `\', t.`TABLE_SCHEMA`, \'`.`\', t.`TABLE_NAME`, \'` CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;\') as sqlcode
+  FROM `information_schema`.`TABLES` t
+ WHERE 1
+   AND t.`TABLE_SCHEMA` = \'dle104win\'
+   AND t.TABLE_COLLATION <> \'utf8_general_ci\'
+ ORDER BY 1');
 	$step2 .= mysql_error();
 	while (($row = mysql_fetch_assoc($rs)) !== false) {
 
 		$time1 = microtime(true);
-		$step2 .= $row['Tables_in_vspomni2'] . '<br>';
-		$table_name = $row['Tables_in_' . $dbname];
-		$query      = 'SHOW CREATE TABLE ' . $table_name;
+		$step2 .= $row['table'] . '<br>';
 
-		$row_create = mysql_query($query);
-		$step2 .= mysql_error();
-		$row1 = mysql_fetch_assoc($row_create);
-
-		if (strpos($row1['Create Table'], 'DEFAULT CHARSET=utf8') !== false) {
-			$step2 .= 'Таблица: <b>' . $table_name . '</b> - <span class="red">пропущено</span>' . '<br>';
-			continue;
-		}
-
-		$create_table_scheme = str_ireplace('cp1251', 'utf8', $row1['Create Table']); // CREATE TABLE SCHEME
-		$create_table_scheme = str_ireplace('ENGINE=InnoDB', 'MyISAM', $create_table_scheme);
-		$create_table_scheme .= ' COLLATE utf8_general_ci';
-
-
-		$query = 'RENAME TABLE ' . $table_name . ' TO ' . $table_name . '_tmp_export'; // RENAME TABLE;
-		mysql_query($query);
+		mysql_query($row['sqlcode']);
 		$error = mysql_error();
 		if (strlen($error) > 0) {
 			$step2 .= $error . ' - LINE ' . __LINE__ . '<br>';
 			break;
 		}
 
-		$query = $create_table_scheme;
-		mysql_query($query);
-		$error = mysql_error();
-		if (strlen($error) > 0) {
-			$step2 .= $error . ' - LINE ' . __LINE__ . '<br>';
-			break;
-		}
-
-		$query = 'ALTER TABLE ' . $table_name . ' DISABLE KEYS';
-		mysql_query($query);
-		$error = mysql_error();
-		if (strlen($error) > 0) {
-			$step2 .= $error . ' - LINE ' . __LINE__ . '<br>';
-			break;
-		}
-
-		$query = 'INSERT INTO ' . $table_name . ' SELECT * FROM ' . $table_name . '_tmp_export';
-		mysql_query($query);
-		$error = mysql_error();
-		if (strlen($error) > 0) {
-			$step2 .= $error . ' - LINE ' . __LINE__ . '<br>';
-			break;
-		}
-
-
-		$query = 'DROP TABLE ' . $table_name . '_tmp_export';
-		mysql_query($query);
-		$error = mysql_error();
-		if (strlen($error) > 0) {
-			$step2 .= $error . ' - LINE ' . __LINE__ . '<br>';
-			break;
-		}
-
-		$time3 = microtime(true);
-		$query = 'ALTER TABLE ' . $table_name . ' ENABLE KEYS';
-		mysql_query($query);
-		$error = mysql_error();
-		if (strlen($error) > 0) {
-			$step2 .= $error . ' - LINE ' . __LINE__ . '<br>';
-			break;
-		}
-
-		$step2 .= 'Enable keys to <b>' . $table_name . '</b>. Время: ' . (microtime(true) - $time3) . '<br>';
 		$step2 .= '<span class="green">готово</span> <b>' . $table_name . '</b>. Время: ' . (microtime(true) - $time1) . '<br>';
-
-
 	}
 	mysql_free_result($rs);
 
