@@ -121,7 +121,7 @@ function step2() {
 CONCAT(\'ALTER TABLE `\', t.`TABLE_SCHEMA`, \'`.`\', t.`TABLE_NAME`, \'` CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;\') as sqlcode
   FROM `information_schema`.`TABLES` t
  WHERE 1
-   AND t.`TABLE_SCHEMA` = \'dle104win\'
+   AND t.`TABLE_SCHEMA` = \''.$dbname.'\'
    AND t.TABLE_COLLATION <> \'utf8_general_ci\'
  ORDER BY 1');
 	$step2 .= mysql_error();
